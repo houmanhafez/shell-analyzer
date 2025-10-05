@@ -6,6 +6,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/rivo/tview"
 )
 
 type keyValue struct {
@@ -20,6 +22,12 @@ var files = []string{
 }
 
 func main() {
+
+	box := tview.NewBox().SetBorder(true).SetTitle("Shell Analyzer")
+
+	if err := tview.NewApplication().SetRoot(box, true).Run(); err != nil {
+		panic(err)
+	}
 
 	commandCounts := make(map[string]int)
 
@@ -42,9 +50,9 @@ func main() {
 				continue
 			}
 
-			lines := strings.Split(string(line), "\n")
+			lines := strings.SplitSeq(string(line), "\n")
 
-			for _, line := range lines {
+			for line := range lines {
 				firstWord := strings.Fields(line)
 				if len(firstWord) == 0 {
 					continue
@@ -84,6 +92,7 @@ func main() {
 		if i >= 10 {
 			break
 		}
+
 		fmt.Printf("%d. %-10s - %d times\n", i+1, kv.Key, kv.Value)
 	}
 }
