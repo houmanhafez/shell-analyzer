@@ -1,6 +1,6 @@
 # Shell Analyzer
 
-basic tool that reads your shell histories and prints a top 10 commands with commit counts in a tview box.
+basic tool that reads your shell histories and prints the top 10 commands with commit counts in a tview box.
 
 ## Requirements
 
