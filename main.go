@@ -6,6 +6,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -107,24 +108,63 @@ func main() {
 	sort.Slice(sortedKeyValues, func(i, j int) bool {
 		return sortedKeyValues[i].Value > sortedKeyValues[j].Value
 	})
+
+	levels := []string{
+		"[white] ░░░░░░░░░░░░░░",
+		"[red]   █░░░░░░░░░░░░░",
+		"[red]   ██░░░░░░░░░░░░",
+		"[red]   ███░░░░░░░░░░░",
+		"[red]   ████░░░░░░░░░░",
+		"[red]   █████░░░░░░░░░",
+		"[yellow]██████░░░░░░░░",
+		"[yellow]███████░░░░░░░",
+		"[yellow]████████░░░░░░",
+		"[yellow]█████████░░░░░",
+		"[yellow]██████████░░░░",
+		"[green] ███████████░░░",
+		"[green] ████████████░░",
+		"[green] █████████████░",
+		"[green] ██████████████",
+	}
+
 	go func() {
-		fmt.Fprintf(textView, "\n     Top 10 Commands\n\n")
+		for i, frame := range levels {
+			app.QueueUpdateDraw(func() {
+
+				textView.SetTextAlign(tview.AlignCenter).SetText("\n" + frame + "\n")
+				if i == len(levels)-1 {
+					textView.SetText("")
+				}
+			})
+
+			time.Sleep(100 * time.Millisecond)
+		}
+
+		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][red]Top 10 commands you've used\n\n")
 		for i, kv := range sortedKeyValues {
 			if i >= 10 {
 				break
 			}
-			fmt.Fprintf(textView, "     %d. %-10s - %d times\n", i+1, kv.Key, kv.Value)
+			fmt.Fprintf(textView, "     [white]%d %-10s - %d times\n", i+1, kv.Key, kv.Value)
 		}
-		fmt.Fprintf(textView, "\n")
+		fmt.Fprintf(textView, "\n\n     Other Facts\n\n")
+
 		for _, kv := range sortedCommitValues {
 
 			fmt.Fprintf(textView, "     %-s - %d times\n", kv.Key, kv.Value)
 		}
 	}()
 
+	go func() {
+
+	}()
+
+	textView.SetDoneFunc(func(key tcell.Key) {
+		app.Stop()
+	})
 	textView.SetDynamicColors(true).SetWrap(true)
 
-	textView.SetBackgroundColor(tcell.Color17)
+	textView.SetBackgroundColor(tcell.NewHexColor(0x0000AA))
 
 	textView.SetTitle("Shell Analyzer").SetTitleColor(tcell.ColorBlack)
 
