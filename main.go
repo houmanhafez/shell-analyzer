@@ -4,38 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
+
+	"shell-analyzer/m/data"
+	"shell-analyzer/m/tui"
 	"strings"
-	"time"
-
-	"github.com/gdamore/tcell/v2"
-	"github.com/rivo/tview"
 )
-
-type keyValue struct {
-	Key   string
-	Value int
-}
-
-var files = []string{
-	os.Getenv("HOME") + "/.bash_history",
-	os.Getenv("HOME") + "/.zsh_history",
-}
 
 func main() {
 
-	app := tview.NewApplication()
-	textView := tview.NewTextView().
-		SetDynamicColors(true).
-		SetRegions(true).
-		SetChangedFunc(func() {
-			app.Draw()
-		})
-
-	commandCounts := make(map[string]int)
-	commitCount := make(map[string]int)
-
-	for _, filePath := range files {
+	for _, filePath := range data.Files {
 		file, err := os.Open(filePath)
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -50,21 +27,49 @@ func main() {
 		historyScanner := bufio.NewScanner(file)
 		for historyScanner.Scan() {
 			line := strings.TrimSpace(historyScanner.Text())
-			if line == "" {
-				continue
-			}
+
+			// fileTail, err := tail.TailFile(filePath, tail.Config{
+			// 	Follow: false, // Do not wait for new lines
+			// 	ReOpen: false, // Do not reopen the file if it changes
+			// })
+			// if err != nil {
+			// 	if os.IsNotExist(err) {
+			// 		fmt.Printf("Skipping %s, file does not exist.\n", filePath)
+			// 		continue
+			// 	}
+			// 	panic(err)
+			// }
 
 			lines := strings.SplitSeq(string(line), "\n")
-
 			for line := range lines {
-				fullLine := strings.Fields(line)
 
+				if line == "" {
+					continue
+				}
+
+				fullLine := strings.Fields(line)
 				if len(fullLine) == 0 {
 					continue
 				}
 				if strings.HasPrefix(line, ":") && strings.Contains(line, ";") {
 					parts := strings.SplitN(line, ";", 2)
 					line = parts[1]
+					//firstPart := strings.Split(parts[0], ":")[0]
+
+					// log.Println("WE ARE HERE")
+
+					// intUnixTime, err := strconv.ParseInt(firstPart[1:], 10, 32)
+					// if err != nil {
+					// 	log.Fatal(err)
+					// }
+
+					// unixTime := time.Unix(intUnixTime, 0)
+					// now := time.Now()
+					// line = parts[1]
+
+					// if now.Sub(unixTime) <= 24*time.Hour && now.After(unixTime) {
+					// 	tui.CommitCount["Todays Commits"]++
+					// }
 				}
 
 				fields := strings.Fields(line)
@@ -74,103 +79,25 @@ func main() {
 				}
 
 				var option string
+				cmd := fields[0]
 				if len(fields) > 1 {
+
 					option = fields[1]
+
+					if cmd == "sudo" {
+						cmd = fields[1]
+					}
 					if option == "commit" && len(fields) > 2 {
-						commitCount["Commits so far"]++
+						tui.CommitCount["Commits Overall"]++
 					}
 				} else {
 					continue
 				}
-
-				cmd := fields[0]
-
-				if cmd == "sudo" && len(fields) > 1 {
-					cmd = fields[1]
-				}
-
-				commandCounts[cmd]++
+				tui.CommandCount[cmd]++
 			}
 		}
 		defer file.Close()
 	}
-	var sortedKeyValues []keyValue
-	var sortedCommitValues []keyValue
+	tui.CreateTextView()
 
-	for key, value := range commandCounts {
-		sortedKeyValues = append(sortedKeyValues, keyValue{key, value})
-	}
-
-	for key, value := range commitCount {
-		sortedCommitValues = append(sortedCommitValues, keyValue{key, value})
-	}
-
-	sort.Slice(sortedKeyValues, func(i, j int) bool {
-		return sortedKeyValues[i].Value > sortedKeyValues[j].Value
-	})
-
-	levels := []string{
-		"[white] ░░░░░░░░░░░░░░",
-		"[red]   █░░░░░░░░░░░░░",
-		"[red]   ██░░░░░░░░░░░░",
-		"[red]   ███░░░░░░░░░░░",
-		"[red]   ████░░░░░░░░░░",
-		"[red]   █████░░░░░░░░░",
-		"[yellow]██████░░░░░░░░",
-		"[yellow]███████░░░░░░░",
-		"[yellow]████████░░░░░░",
-		"[yellow]█████████░░░░░",
-		"[yellow]██████████░░░░",
-		"[green] ███████████░░░",
-		"[green] ████████████░░",
-		"[green] █████████████░",
-		"[green] ██████████████",
-	}
-
-	go func() {
-		for i, frame := range levels {
-			app.QueueUpdateDraw(func() {
-
-				textView.SetTextAlign(tview.AlignCenter).SetText("\n" + frame + "\n")
-				if i == len(levels)-1 {
-					textView.SetText("")
-				}
-			})
-
-			time.Sleep(100 * time.Millisecond)
-		}
-
-		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][red]Top 10 commands you've used\n\n")
-		for i, kv := range sortedKeyValues {
-			if i >= 10 {
-				break
-			}
-			fmt.Fprintf(textView, "     [white]%d %-10s - %d times\n", i+1, kv.Key, kv.Value)
-		}
-		fmt.Fprintf(textView, "\n\n     Other Facts\n\n")
-
-		for _, kv := range sortedCommitValues {
-
-			fmt.Fprintf(textView, "     %-s - %d times\n", kv.Key, kv.Value)
-		}
-	}()
-
-	go func() {
-
-	}()
-
-	textView.SetDoneFunc(func(key tcell.Key) {
-		app.Stop()
-	})
-	textView.SetDynamicColors(true).SetWrap(true)
-
-	textView.SetBackgroundColor(tcell.NewHexColor(0x0000AA))
-
-	textView.SetTitle("Shell Analyzer").SetTitleColor(tcell.ColorBlack)
-
-	textView.SetBorder(true).SetBackgroundColor(tcell.ColorWhite)
-
-	if err := app.SetRoot(textView, true).SetFocus(textView).Run(); err != nil {
-		panic(err)
-	}
 }
