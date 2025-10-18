@@ -13,7 +13,7 @@ import (
 var CommandCount = make(map[string]int)
 var CommitCount = make(map[string]int)
 
-func NewTextView() *tview.TextView {
+func CreateTextView() *tview.TextView {
 	app := tview.NewApplication()
 	textView := tview.NewTextView().
 		SetDynamicColors(true).
@@ -21,24 +21,6 @@ func NewTextView() *tview.TextView {
 		SetChangedFunc(func() {
 			app.Draw()
 		})
-
-	levels := []string{
-		"[white] ░░░░░░░░░░░░░░",
-		"[red]   █░░░░░░░░░░░░░",
-		"[red]   ██░░░░░░░░░░░░",
-		"[red]   ███░░░░░░░░░░░",
-		"[red]   ████░░░░░░░░░░",
-		"[red]   █████░░░░░░░░░",
-		"[yellow]██████░░░░░░░░",
-		"[yellow]███████░░░░░░░",
-		"[yellow]████████░░░░░░",
-		"[yellow]█████████░░░░░",
-		"[yellow]██████████░░░░",
-		"[green] ███████████░░░",
-		"[green] ████████████░░",
-		"[green] █████████████░",
-		"[green] ██████████████",
-	}
 
 	go func() {
 
@@ -57,16 +39,16 @@ func NewTextView() *tview.TextView {
 			return sortedCommandUses[i].Uses > sortedCommandUses[j].Uses
 		})
 
-		for i, frame := range levels {
+		for i, frame := range data.ProgressBar {
 			app.QueueUpdateDraw(func() {
 
 				textView.SetTextAlign(tview.AlignCenter).SetText("\n" + frame + "\n")
-				if i == len(levels)-1 {
+				if i == len(data.ProgressBar)-1 {
 					textView.SetText("")
 				}
 			})
 
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		}
 
 		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][red]Top 10 commands you've used\n\n")
@@ -79,7 +61,6 @@ func NewTextView() *tview.TextView {
 		fmt.Fprintf(textView, "\n\n     Other Facts\n\n")
 
 		for _, kv := range sortedCommitValues {
-
 			fmt.Fprintf(textView, "     %-s - %d times\n", kv.CommitType, kv.Commits)
 		}
 	}()
@@ -88,11 +69,8 @@ func NewTextView() *tview.TextView {
 		app.Stop()
 	})
 	textView.SetDynamicColors(true).SetWrap(true)
-
 	textView.SetBackgroundColor(tcell.NewHexColor(0x0000AA))
-
 	textView.SetTitle("Shell Analyzer").SetTitleColor(tcell.ColorBlack)
-
 	textView.SetBorder(true).SetBackgroundColor(tcell.ColorWhite)
 
 	if err := app.SetRoot(textView, true).SetFocus(textView).Run(); err != nil {
