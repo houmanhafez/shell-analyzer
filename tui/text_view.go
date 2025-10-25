@@ -53,7 +53,7 @@ func CreateTextView() *tview.TextView {
 				}
 			})
 
-			time.Sleep(50 * time.Millisecond)
+			time.Sleep(30 * time.Millisecond)
 		}
 
 		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][yellow]Top 10 commands you've used\n\n")
