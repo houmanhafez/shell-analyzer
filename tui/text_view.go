@@ -12,6 +12,7 @@ import (
 
 var CommandCount = make(map[string]int)
 var CommitCount = make(map[string]int)
+var OtherCount = make(map[string]int)
 
 func CreateTextView() *tview.TextView {
 	app := tview.NewApplication()
@@ -26,13 +27,17 @@ func CreateTextView() *tview.TextView {
 
 		var sortedCommandUses []data.CommandUses
 		var sortedCommitValues []data.Commits
-
+		var sortedOtherValues []data.CommandUses
 		for command, uses := range CommandCount {
 			sortedCommandUses = append(sortedCommandUses, data.CommandUses{Command: command, Uses: uses})
 		}
 
 		for commitType, commits := range CommitCount {
 			sortedCommitValues = append(sortedCommitValues, data.Commits{CommitType: commitType, Commits: commits})
+		}
+
+		for command, uses := range OtherCount {
+			sortedOtherValues = append(sortedOtherValues, data.CommandUses{Command: command, Uses: uses})
 		}
 
 		sort.Slice(sortedCommandUses, func(i, j int) bool {
@@ -51,7 +56,7 @@ func CreateTextView() *tview.TextView {
 			time.Sleep(50 * time.Millisecond)
 		}
 
-		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][red]Top 10 commands you've used\n\n")
+		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][yellow]Top 10 commands you've used\n\n")
 		for i, kv := range sortedCommandUses {
 			if i >= 10 {
 				break
@@ -61,7 +66,11 @@ func CreateTextView() *tview.TextView {
 		fmt.Fprintf(textView, "\n\n     Other Facts\n\n")
 
 		for _, kv := range sortedCommitValues {
-			fmt.Fprintf(textView, "     %-s - %d times\n", kv.CommitType, kv.Commits)
+			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.CommitType, kv.Commits)
+		}
+
+		for _, kv := range sortedOtherValues {
+			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.Command, kv.Uses)
 		}
 	}()
 

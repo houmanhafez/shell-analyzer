@@ -3,7 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
+	"strconv"
+	"time"
 
 	"shell-analyzer/m/data"
 	"shell-analyzer/m/tui"
@@ -51,25 +54,27 @@ func main() {
 				if len(fullLine) == 0 {
 					continue
 				}
+
+				var commandTime time.Time
 				if strings.HasPrefix(line, ":") && strings.Contains(line, ";") {
 					parts := strings.SplitN(line, ";", 2)
+
 					line = parts[1]
-					//firstPart := strings.Split(parts[0], ":")[0]
+					firstPart := strings.SplitN(parts[0], ":", 3)
 
-					// log.Println("WE ARE HERE")
+					strUnixTimeWithoutSpace := strings.TrimSpace(firstPart[1])
+					intUnixTime, err := strconv.ParseInt(strUnixTimeWithoutSpace, 10, 32)
+					if err != nil {
+						log.Fatal(err)
+					}
 
-					// intUnixTime, err := strconv.ParseInt(firstPart[1:], 10, 32)
-					// if err != nil {
-					// 	log.Fatal(err)
-					// }
+					commandTime = time.Unix(intUnixTime, 0)
+					line = parts[1]
 
-					// unixTime := time.Unix(intUnixTime, 0)
-					// now := time.Now()
-					// line = parts[1]
+					if time.Now().Sub(commandTime) <= 24*time.Hour && time.Now().After(commandTime) {
+						tui.OtherCount["Commands today"]++
+					}
 
-					// if now.Sub(unixTime) <= 24*time.Hour && now.After(unixTime) {
-					// 	tui.CommitCount["Todays Commits"]++
-					// }
 				}
 
 				fields := strings.Fields(line)
@@ -89,6 +94,9 @@ func main() {
 					}
 					if option == "commit" && len(fields) > 2 {
 						tui.CommitCount["Commits Overall"]++
+						if commandTime.After(time.Now().Add(-24 * time.Hour)) {
+							tui.CommitCount["Commits Today"]++
+						}
 					}
 				} else {
 					continue
@@ -99,5 +107,4 @@ func main() {
 		defer file.Close()
 	}
 	tui.CreateTextView()
-
 }
