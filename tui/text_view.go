@@ -28,6 +28,7 @@ func CreateTextView() *tview.TextView {
 		var sortedCommandUses []data.CommandUses
 		var sortedCommitValues []data.Commits
 		var sortedOtherValues []data.CommandUses
+
 		for command, uses := range CommandCount {
 			sortedCommandUses = append(sortedCommandUses, data.CommandUses{Command: command, Uses: uses})
 		}
@@ -63,7 +64,7 @@ func CreateTextView() *tview.TextView {
 			}
 			fmt.Fprintf(textView, "     [white]%d %-10s - %d times\n", i+1, kv.Command, kv.Uses)
 		}
-		fmt.Fprintf(textView, "\n\n     Other Facts\n\n")
+		fmt.Fprintf(textView, "\n\n     [yellow]Other Facts\n\n")
 
 		for _, kv := range sortedCommitValues {
 			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.CommitType, kv.Commits)
@@ -74,15 +75,13 @@ func CreateTextView() *tview.TextView {
 		}
 	}()
 
-	textView.SetDoneFunc(func(key tcell.Key) {
-		app.Stop()
-	})
+	textView.SetDoneFunc(func(key tcell.Key) { app.Stop() })
 	textView.SetDynamicColors(true).SetWrap(true)
 	textView.SetBackgroundColor(tcell.NewHexColor(0x0000AA))
 	textView.SetTitle("Shell Analyzer").SetTitleColor(tcell.ColorBlack)
 	textView.SetBorder(true).SetBackgroundColor(tcell.ColorWhite)
 
-	if err := app.SetRoot(textView, true).SetFocus(textView).Run(); err != nil {
+	if err := app.SetRoot(textView, true).SetFocus(textView).EnableMouse(true).Run(); err != nil {
 		panic(err)
 	}
 	return textView

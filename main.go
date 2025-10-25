@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"shell-analyzer/m/commands"
 	"shell-analyzer/m/data"
 	"shell-analyzer/m/tui"
 	"strings"
@@ -40,8 +41,6 @@ func main() {
 					continue
 				}
 
-				var commandTime time.Time
-
 				if strings.HasPrefix(singleLine, ":") && strings.Contains(singleLine, ";") {
 					parts := strings.SplitN(singleLine, ";", 2)
 					if len(parts) < 2 {
@@ -55,33 +54,24 @@ func main() {
 						continue
 					}
 
-					commandTime = time.Unix(unixInt, 0)
+					data.CommandTime = time.Unix(unixInt, 0)
 					singleLine = parts[1]
 
-					if time.Since(commandTime) <= 24*time.Hour && time.Now().After(commandTime) {
+					if time.Since(data.CommandTime) <= 24*time.Hour && time.Now().After(data.CommandTime) {
 						tui.OtherCount["Commands today"]++
 					}
 				}
 
-				fields := strings.Fields(singleLine)
-				if len(fields) == 0 {
+				data.LineFields = strings.Fields(singleLine)
+				if len(data.LineFields) == 0 {
 					continue
 				}
 
-				cmd := fields[0]
-				if cmd == "sudo" && len(fields) > 1 {
-					cmd = fields[1]
-				}
+				commands.CheckGitCommits()
 
-				if len(fields) > 1 {
-					option := fields[1]
-
-					if option == "commit" {
-						tui.CommitCount["Commits Overall"]++
-						if time.Since(commandTime) <= 24*time.Hour {
-							tui.CommitCount["Commits Today"]++
-						}
-					}
+				cmd := data.LineFields[0]
+				if cmd == "sudo" && len(data.LineFields) > 1 {
+					cmd = data.LineFields[1]
 				}
 
 				tui.CommandCount[cmd]++
