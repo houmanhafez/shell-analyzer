@@ -35,8 +35,8 @@ func main() {
 				continue
 			}
 
-			lines := strings.Split(rawLine, "\n")
-			for _, singleLine := range lines {
+			lines := strings.SplitSeq(rawLine, "\n")
+			for singleLine := range lines {
 				if singleLine == "" {
 					continue
 				}
@@ -54,11 +54,11 @@ func main() {
 						continue
 					}
 
-					data.CommandTime = time.Unix(unixInt, 0)
+					data.CmdTime = time.Unix(unixInt, 0)
 					singleLine = parts[1]
 
-					if time.Since(data.CommandTime) <= 24*time.Hour && time.Now().After(data.CommandTime) {
-						tui.OtherCount["Commands today"]++
+					if time.Since(data.CmdTime) <= 24*time.Hour && time.Now().After(data.CmdTime) {
+						tui.UnsortedSystemCmds["Commands today"]++
 					}
 				}
 
@@ -74,7 +74,7 @@ func main() {
 					cmd = data.LineFields[1]
 				}
 
-				tui.CommandCount[cmd]++
+				tui.UnsortedTopCmds[cmd]++
 			}
 		}
 	}

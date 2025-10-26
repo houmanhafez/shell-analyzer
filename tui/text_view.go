@@ -10,9 +10,9 @@ import (
 	"github.com/rivo/tview"
 )
 
-var CommandCount = make(map[string]int)
-var CommitCount = make(map[string]int)
-var OtherCount = make(map[string]int)
+var UnsortedTopCmds = make(map[string]int)
+var UnsortedGitCmds = make(map[string]int)
+var UnsortedSystemCmds = make(map[string]int)
 
 func CreateTextView() *tview.TextView {
 	app := tview.NewApplication()
@@ -25,24 +25,24 @@ func CreateTextView() *tview.TextView {
 
 	go func() {
 
-		var sortedCommandUses []data.CommandUses
-		var sortedCommitValues []data.Commits
-		var sortedOtherValues []data.CommandUses
+		var sortedTopCmdValues []data.TopCmds
+		var sortedGitCmdValues []data.GitCmds
+		var sortedSystemCmdValues []data.TopCmds
 
-		for command, uses := range CommandCount {
-			sortedCommandUses = append(sortedCommandUses, data.CommandUses{Command: command, Uses: uses})
+		for command, uses := range UnsortedTopCmds {
+			sortedTopCmdValues = append(sortedTopCmdValues, data.TopCmds{Command: command, Uses: uses})
 		}
 
-		for commitType, commits := range CommitCount {
-			sortedCommitValues = append(sortedCommitValues, data.Commits{CommitType: commitType, Commits: commits})
+		for commitType, commits := range UnsortedGitCmds {
+			sortedGitCmdValues = append(sortedGitCmdValues, data.GitCmds{Command: commitType, Uses: commits})
 		}
 
-		for command, uses := range OtherCount {
-			sortedOtherValues = append(sortedOtherValues, data.CommandUses{Command: command, Uses: uses})
+		for command, uses := range UnsortedSystemCmds {
+			sortedSystemCmdValues = append(sortedSystemCmdValues, data.TopCmds{Command: command, Uses: uses})
 		}
 
-		sort.Slice(sortedCommandUses, func(i, j int) bool {
-			return sortedCommandUses[i].Uses > sortedCommandUses[j].Uses
+		sort.Slice(sortedTopCmdValues, func(i, j int) bool {
+			return sortedTopCmdValues[i].Uses > sortedTopCmdValues[j].Uses
 		})
 
 		for i, frame := range data.ProgressBar {
@@ -58,19 +58,21 @@ func CreateTextView() *tview.TextView {
 		}
 
 		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][yellow]Top 10 commands you've used\n\n")
-		for i, kv := range sortedCommandUses {
+
+		for i, kv := range sortedTopCmdValues {
 			if i >= 10 {
 				break
 			}
 			fmt.Fprintf(textView, "     [white]%d %-10s - %d times\n", i+1, kv.Command, kv.Uses)
 		}
+
 		fmt.Fprintf(textView, "\n\n     [yellow]Other Facts\n\n")
 
-		for _, kv := range sortedCommitValues {
-			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.CommitType, kv.Commits)
+		for _, kv := range sortedGitCmdValues {
+			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.Command, kv.Uses)
 		}
 
-		for _, kv := range sortedOtherValues {
+		for _, kv := range sortedSystemCmdValues {
 			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.Command, kv.Uses)
 		}
 	}()

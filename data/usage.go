@@ -3,14 +3,19 @@ package data
 import "time"
 
 var LineFields []string
-var CommandTime time.Time
+var CmdTime time.Time
 
-type CommandUses struct {
+type TopCmds struct {
 	Command string
 	Uses    int
 }
 
-type Commits struct {
-	CommitType string
-	Commits    int
+type GitCmds struct {
+	Command string
+	Uses    int
+}
+
+type SystemCmds struct {
+	Command string
+	Uses    int
 }
