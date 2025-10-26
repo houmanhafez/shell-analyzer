@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func CheckGitCommits() {
+func CheckGitCommands() {
 
 	if len(data.LineFields) > 1 && data.LineFields[0] == "git" {
 

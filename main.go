@@ -67,7 +67,7 @@ func main() {
 					continue
 				}
 
-				commands.CheckGitCommits()
+				commands.CheckGitCommands()
 
 				cmd := data.LineFields[0]
 				if cmd == "sudo" && len(data.LineFields) > 1 {
