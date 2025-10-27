@@ -73,7 +73,7 @@ func CreateTextView() *tview.TextView {
 		}
 
 		for _, kv := range sortedSystemCmdValues {
-			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.Command, kv.Uses)
+			fmt.Fprintf(textView, "\n     [white]%-s - %d\n", kv.Command, kv.Uses)
 		}
 	}()
 
