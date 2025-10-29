@@ -70,10 +70,12 @@ func main() {
 				commands.CheckGitCommands()
 
 				cmd := data.LineFields[0]
-				if cmd == "sudo" && len(data.LineFields) > 1 {
+				if len(data.LineFields) > 1 && cmd == "sudo" {
 					cmd = data.LineFields[1]
 				}
-
+				if len(data.LineFields) > 2 && strings.Contains(data.LineFields[1], "-") {
+					cmd = data.LineFields[2]
+				}
 				tui.UnsortedTopCmds[cmd]++
 			}
 		}

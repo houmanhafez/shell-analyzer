@@ -57,23 +57,35 @@ func CreateTextView() *tview.TextView {
 			time.Sleep(30 * time.Millisecond)
 		}
 
-		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [::b][yellow]Top 10 commands you've used\n\n")
-
+		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [red::b]Top 10 commands you've used[-]\n\n")
 		for i, kv := range sortedTopCmdValues {
 			if i >= 10 {
 				break
 			}
-			fmt.Fprintf(textView, "     [white]%d %-10s - %d times\n", i+1, kv.Command, kv.Uses)
+
+			var color string
+			switch i {
+			case 0:
+				color = "gold"
+			case 1:
+				color = "silver"
+			case 2:
+				color = "orange"
+			default:
+				color = "white"
+			}
+
+			fmt.Fprintf(textView, "     [%s]%2d. %-30s - %5d times\n", color, i+1, kv.Command, kv.Uses)
 		}
 
 		fmt.Fprintf(textView, "\n\n     [yellow]Other Facts\n\n")
 
 		for _, kv := range sortedGitCmdValues {
-			fmt.Fprintf(textView, "     [white]%-s - %d\n", kv.Command, kv.Uses)
+			fmt.Fprintf(textView, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 		}
 
 		for _, kv := range sortedSystemCmdValues {
-			fmt.Fprintf(textView, "\n     [white]%-s - %d\n", kv.Command, kv.Uses)
+			fmt.Fprintf(textView, "\n     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 		}
 	}()
 
