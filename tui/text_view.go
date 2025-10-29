@@ -11,8 +11,12 @@ import (
 )
 
 var UnsortedTopCmds = make(map[string]int)
-var UnsortedGitCmds = make(map[string]int)
-var UnsortedSystemCmds = make(map[string]int)
+
+var UnsortedGitCmdsDaily = make(map[string]int)
+var UnsortedSystemCmdsDaily = make(map[string]int)
+
+var UnsortedGitCmdsTotal = make(map[string]int)
+var UnsortedSystemCmdsTotal = make(map[string]int)
 
 func CreateTextView() *tview.TextView {
 	app := tview.NewApplication()
@@ -26,19 +30,31 @@ func CreateTextView() *tview.TextView {
 	go func() {
 
 		var sortedTopCmdValues []data.TopCmds
-		var sortedGitCmdValues []data.GitCmds
-		var sortedSystemCmdValues []data.TopCmds
+
+		var sortedGitCmdDailyValues []data.GitCmds
+		var sortedSystemCmdDailyValues []data.TopCmds
+
+		var sortedGitCmdTotalValues []data.GitCmds
+		var sortedSystemCmdTotalValues []data.TopCmds
 
 		for command, uses := range UnsortedTopCmds {
 			sortedTopCmdValues = append(sortedTopCmdValues, data.TopCmds{Command: command, Uses: uses})
 		}
 
-		for commitType, commits := range UnsortedGitCmds {
-			sortedGitCmdValues = append(sortedGitCmdValues, data.GitCmds{Command: commitType, Uses: commits})
+		for commitType, commits := range UnsortedGitCmdsDaily {
+			sortedGitCmdDailyValues = append(sortedGitCmdDailyValues, data.GitCmds{Command: commitType, Uses: commits})
 		}
 
-		for command, uses := range UnsortedSystemCmds {
-			sortedSystemCmdValues = append(sortedSystemCmdValues, data.TopCmds{Command: command, Uses: uses})
+		for command, uses := range UnsortedSystemCmdsTotal {
+			sortedSystemCmdDailyValues = append(sortedSystemCmdDailyValues, data.TopCmds{Command: command, Uses: uses})
+		}
+
+		for commitType, commits := range UnsortedGitCmdsTotal {
+			sortedGitCmdTotalValues = append(sortedGitCmdTotalValues, data.GitCmds{Command: commitType, Uses: commits})
+		}
+
+		for command, uses := range UnsortedSystemCmdsTotal {
+			sortedSystemCmdTotalValues = append(sortedSystemCmdTotalValues, data.TopCmds{Command: command, Uses: uses})
 		}
 
 		sort.Slice(sortedTopCmdValues, func(i, j int) bool {
@@ -78,13 +94,22 @@ func CreateTextView() *tview.TextView {
 			fmt.Fprintf(textView, "     [%s]%2d. %-30s - %5d times\n", color, i+1, kv.Command, kv.Uses)
 		}
 
-		fmt.Fprintf(textView, "\n\n     [yellow]Other Facts\n\n")
+		fmt.Fprintf(textView, "\n\n     [yellow]Report of Today\n\n")
 
-		for _, kv := range sortedGitCmdValues {
+		for _, kv := range sortedGitCmdDailyValues {
 			fmt.Fprintf(textView, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 		}
 
-		for _, kv := range sortedSystemCmdValues {
+		for _, kv := range sortedSystemCmdDailyValues {
+			fmt.Fprintf(textView, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
+		}
+
+		fmt.Fprintf(textView, "\n\n     [yellow]Overall\n\n")
+
+		for _, kv := range sortedGitCmdTotalValues {
+			fmt.Fprintf(textView, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
+		}
+		for _, kv := range sortedSystemCmdTotalValues {
 			fmt.Fprintf(textView, "\n     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 		}
 	}()

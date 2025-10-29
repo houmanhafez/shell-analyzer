@@ -13,41 +13,41 @@ func CheckGitCommands() {
 		switch option := data.LineFields[1]; option {
 
 		case "commit":
-			tui.UnsortedGitCmds["Git Commits Overall"]++
+			tui.UnsortedGitCmdsTotal["Git Commits Overall"]++
 			if time.Since(data.CmdTime) <= 24*time.Hour {
-				tui.UnsortedGitCmds["Git Commits Today"]++
+				tui.UnsortedGitCmdsDaily["Git Commits Today"]++
 			}
 
 		case "pull":
-			tui.UnsortedGitCmds["Git Pulls Overall"]++
+			tui.UnsortedGitCmdsTotal["Git Pulls Overall"]++
 			if time.Since(data.CmdTime) <= 24*time.Hour {
-				tui.UnsortedGitCmds["Git Pulls Today"]++
+				tui.UnsortedGitCmdsDaily["Git Pulls Today"]++
 			}
 
 		case "push":
-			tui.UnsortedGitCmds["Git Pushes Overall"]++
+			tui.UnsortedGitCmdsTotal["Git Pushes Overall"]++
 			if time.Since(data.CmdTime) <= 24*time.Hour {
-				tui.UnsortedGitCmds["Git Pushes Today"]++
+				tui.UnsortedGitCmdsDaily["Git Pushes Today"]++
 			}
 
 		case "add":
-			tui.UnsortedGitCmds["Git Adds Overall"]++
+			tui.UnsortedGitCmdsTotal["Git Adds Overall"]++
 			if time.Since(data.CmdTime) <= 24*time.Hour {
-				tui.UnsortedGitCmds["Git Adds Today"]++
+				tui.UnsortedGitCmdsDaily["Git Adds Today"]++
 			}
 
 		case "status":
-			tui.UnsortedGitCmds["Git Statuses Overall"]++
+			tui.UnsortedGitCmdsTotal["Git Statuses Overall"]++
 			if time.Since(data.CmdTime) <= 24*time.Hour {
-				tui.UnsortedGitCmds["Git Statuses Today"]++
+				tui.UnsortedGitCmdsDaily["Git Statuses Today"]++
 			}
 
 		case "checkout":
 			if data.LineFields[2] == "-b" {
-				tui.UnsortedGitCmds["Git Branches Created Overall"]++
+				tui.UnsortedGitCmdsTotal["Git Branches Created Overall"]++
 			}
 			if time.Since(data.CmdTime) <= 24*time.Hour {
-				tui.UnsortedGitCmds["Git Branch Switches Today"]++
+				tui.UnsortedGitCmdsDaily["Git Branch Switches Today"]++
 			}
 		}
 	}
