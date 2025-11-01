@@ -26,19 +26,19 @@ func CheckSystemCommands() {
 		switch option := data.LineFields[0]; option {
 
 		case "flatpak":
-			tui.UnsortedSystemCmds["Flatpak Overall"]++
+			tui.UnsortedSystemCmdsTotal["Flatpak Overall"]++
 
 		case "apt":
-			tui.UnsortedSystemCmds["APT Overall"]++
+			tui.UnsortedSystemCmdsTotal["APT Overall"]++
 
 		case "dnf":
-			tui.UnsortedSystemCmds["DNF Overall"]++
+			tui.UnsortedSystemCmdsTotal["DNF Overall"]++
 
 		case "yay":
-			tui.UnsortedSystemCmds["Yay Overall"]++
+			tui.UnsortedSystemCmdsTotal["Yay Overall"]++
 
 		case "brew":
-			tui.UnsortedSystemCmds["Brew Overall"]++
+			tui.UnsortedSystemCmdsTotal["Brew Overall"]++
 		}
 	}
 }

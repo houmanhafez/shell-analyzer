@@ -13,47 +13,47 @@ func CheckGitCommands() {
 		switch option := data.LineFields[1]; option {
 
 		case "commit":
-			tui.UnsortedGitCmds["Git Commits Overall"]++
-			if isToday(data.CmdTime) {
-				tui.UnsortedGitCmds["Git Commits Today"]++
+			tui.UnsortedGitCmdsTotal["Git Commits Overall"]++
+			if IsToday(data.CmdTime) {
+				tui.UnsortedGitCmdsDaily["Git Commits Today"]++
 			}
 
 		case "pull":
-			tui.UnsortedGitCmds["Git Pulls Overall"]++
-			if isToday(data.CmdTime) {
-				tui.UnsortedGitCmds["Git Pulls Today"]++
+			tui.UnsortedGitCmdsTotal["Git Pulls Overall"]++
+			if IsToday(data.CmdTime) {
+				tui.UnsortedGitCmdsDaily["Git Pulls Today"]++
 			}
 
 		case "push":
-			tui.UnsortedGitCmds["Git Pushes Overall"]++
-			if isToday(data.CmdTime) {
-				tui.UnsortedGitCmds["Git Pushes Today"]++
+			tui.UnsortedGitCmdsTotal["Git Pushes Overall"]++
+			if IsToday(data.CmdTime) {
+				tui.UnsortedGitCmdsDaily["Git Pushes Today"]++
 			}
 
 		case "add":
-			tui.UnsortedGitCmds["Git Adds Overall"]++
-			if isToday(data.CmdTime) {
-				tui.UnsortedGitCmds["Git Adds Today"]++
+			tui.UnsortedGitCmdsTotal["Git Adds Overall"]++
+			if IsToday(data.CmdTime) {
+				tui.UnsortedGitCmdsDaily["Git Adds Today"]++
 			}
 
 		case "status":
-			tui.UnsortedGitCmds["Git Statuses Overall"]++
-			if isToday(data.CmdTime) {
-				tui.UnsortedGitCmds["Git Statuses Today"]++
+			tui.UnsortedGitCmdsTotal["Git Statuses Overall"]++
+			if IsToday(data.CmdTime) {
+				tui.UnsortedGitCmdsDaily["Git Statuses Today"]++
 			}
 
 		case "checkout":
 			if data.LineFields[2] == "-b" {
-				tui.UnsortedGitCmds["Git Branches Created Overall"]++
+				tui.UnsortedGitCmdsTotal["Git Branches Created Overall"]++
 			}
 			if time.Since(data.CmdTime) <= 24*time.Hour {
-				tui.UnsortedGitCmds["Git Branch Switches Today"]++
+				tui.UnsortedGitCmdsDaily["Git Branch Switches Today"]++
 			}
 		}
 	}
 }
 
-func isToday(t time.Time) bool {
+func IsToday(t time.Time) bool {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	return t.After(today) && t.Before(today.Add(24*time.Hour))

@@ -57,8 +57,8 @@ func main() {
 					data.CmdTime = time.Unix(unixInt, 0)
 					singleLine = parts[1]
 
-					if time.Since(data.CmdTime) <= 24*time.Hour && time.Now().After(data.CmdTime) {
-						tui.UnsortedSystemCmds["Commands today"]++
+					if commands.IsToday(data.CmdTime) {
+						tui.UnsortedGitCmdsDaily["Commands today"]++
 					}
 				}
 
