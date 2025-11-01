@@ -27,7 +27,7 @@ func CreateTextView() *tview.TextView {
 
 		var sortedTopCmdValues []data.TopCmds
 		var sortedGitCmdValues []data.GitCmds
-		var sortedSystemCmdValues []data.TopCmds
+		var sortedSystemCmdValues []data.SystemCmds
 
 		for command, uses := range UnsortedTopCmds {
 			sortedTopCmdValues = append(sortedTopCmdValues, data.TopCmds{Command: command, Uses: uses})
@@ -38,7 +38,7 @@ func CreateTextView() *tview.TextView {
 		}
 
 		for command, uses := range UnsortedSystemCmds {
-			sortedSystemCmdValues = append(sortedSystemCmdValues, data.TopCmds{Command: command, Uses: uses})
+			sortedSystemCmdValues = append(sortedSystemCmdValues, data.SystemCmds{Command: command, Uses: uses})
 		}
 
 		sort.Slice(sortedTopCmdValues, func(i, j int) bool {

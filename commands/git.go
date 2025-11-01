@@ -14,31 +14,31 @@ func CheckGitCommands() {
 
 		case "commit":
 			tui.UnsortedGitCmds["Git Commits Overall"]++
-			if time.Since(data.CmdTime) <= 24*time.Hour {
+			if isToday(data.CmdTime) {
 				tui.UnsortedGitCmds["Git Commits Today"]++
 			}
 
 		case "pull":
 			tui.UnsortedGitCmds["Git Pulls Overall"]++
-			if time.Since(data.CmdTime) <= 24*time.Hour {
+			if isToday(data.CmdTime) {
 				tui.UnsortedGitCmds["Git Pulls Today"]++
 			}
 
 		case "push":
 			tui.UnsortedGitCmds["Git Pushes Overall"]++
-			if time.Since(data.CmdTime) <= 24*time.Hour {
+			if isToday(data.CmdTime) {
 				tui.UnsortedGitCmds["Git Pushes Today"]++
 			}
 
 		case "add":
 			tui.UnsortedGitCmds["Git Adds Overall"]++
-			if time.Since(data.CmdTime) <= 24*time.Hour {
+			if isToday(data.CmdTime) {
 				tui.UnsortedGitCmds["Git Adds Today"]++
 			}
 
 		case "status":
 			tui.UnsortedGitCmds["Git Statuses Overall"]++
-			if time.Since(data.CmdTime) <= 24*time.Hour {
+			if isToday(data.CmdTime) {
 				tui.UnsortedGitCmds["Git Statuses Today"]++
 			}
 
@@ -51,4 +51,10 @@ func CheckGitCommands() {
 			}
 		}
 	}
+}
+
+func isToday(t time.Time) bool {
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	return t.After(today) && t.Before(today.Add(24*time.Hour))
 }
