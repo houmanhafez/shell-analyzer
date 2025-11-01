@@ -18,22 +18,17 @@ var UnsortedSystemCmdsDaily = make(map[string]int)
 var UnsortedGitCmdsTotal = make(map[string]int)
 var UnsortedSystemCmdsTotal = make(map[string]int)
 
-func CreateTextView() *tview.TextView {
-	app := tview.NewApplication()
-	textView := tview.NewTextView().
-		SetDynamicColors(true).
-		SetRegions(true).
-		SetChangedFunc(func() {
-			app.Draw()
-		})
+func CreateTextView(app *tview.Application) *tview.Flex {
+	top := tview.NewTextView()
+	left := tview.NewTextView()
+	rightTop := tview.NewTextView()
+	rightBottom := tview.NewTextView()
+	bottom := tview.NewTextView()
 
 	go func() {
-
 		var sortedTopCmdValues []data.TopCmds
-
 		var sortedGitCmdDailyValues []data.GitCmds
 		var sortedSystemCmdDailyValues []data.SystemCmds
-
 		var sortedGitCmdTotalValues []data.GitCmds
 		var sortedSystemCmdTotalValues []data.SystemCmds
 
@@ -61,67 +56,91 @@ func CreateTextView() *tview.TextView {
 		})
 
 		for i, frame := range data.ProgressBar {
+			currentFrame := i
 			app.QueueUpdateDraw(func() {
-
-				textView.SetTextAlign(tview.AlignCenter).SetText("\n" + frame + "\n")
-				if i == len(data.ProgressBar)-1 {
-					textView.SetText("")
+				top.SetTextAlign(tview.AlignCenter).SetText("\n" + frame + "\n")
+				if currentFrame == len(data.ProgressBar)-1 {
+					top.SetText("")
 				}
 			})
-
 			time.Sleep(30 * time.Millisecond)
 		}
 
-		textView.SetTextAlign(tview.AlignLeft).SetText("\n     [red::b]Top 10 commands you've used[-]\n\n")
-		for i, kv := range sortedTopCmdValues {
-			if i >= 10 {
-				break
+		app.QueueUpdateDraw(func() {
+			fmt.Fprintf(top, "\n[white::b]DOS BIOS (2A4FVCXL)\nSHELL ANALYZING UTILITY - COPYRIGHT (C) 1985-2005, AMERICAN MEGATRON INC.\n\n")
+		})
+
+		app.QueueUpdateDraw(func() {
+			left.SetTextAlign(tview.AlignLeft).SetText("\n     [red::b]TOP 20 COMMANDS YOU'VE USED[-]\n\n")
+			for i, kv := range sortedTopCmdValues {
+				if i >= 20 {
+					break
+				}
+
+				var color string
+				switch i {
+				case 0:
+					color = "gold"
+				case 1:
+					color = "silver"
+				case 2:
+					color = "orange"
+				default:
+					color = "white"
+				}
+
+				fmt.Fprintf(left, "     [%s]%2d. %-30s - %5d times\n", color, i+1, kv.Command, kv.Uses)
+			}
+		})
+
+		app.QueueUpdateDraw(func() {
+			fmt.Fprintf(rightTop, "\n     [yellow::b]REPORT OF TODAY\n\n")
+
+			for _, kv := range sortedGitCmdDailyValues {
+				fmt.Fprintf(rightTop, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
 
-			var color string
-			switch i {
-			case 0:
-				color = "gold"
-			case 1:
-				color = "silver"
-			case 2:
-				color = "orange"
-			default:
-				color = "white"
+			for _, kv := range sortedSystemCmdDailyValues {
+				fmt.Fprintf(rightTop, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
+		})
 
-			fmt.Fprintf(textView, "     [%s]%2d. %-30s - %5d times\n", color, i+1, kv.Command, kv.Uses)
-		}
+		app.QueueUpdateDraw(func() {
+			fmt.Fprintf(rightBottom, "\n     [yellow::b]OVERALL USAGE\n\n")
 
-		fmt.Fprintf(textView, "\n\n     [yellow]Report of Today\n\n")
+			for _, kv := range sortedGitCmdTotalValues {
+				fmt.Fprintf(rightBottom, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
+			}
+			for _, kv := range sortedSystemCmdTotalValues {
+				fmt.Fprintf(rightBottom, "\n     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
+			}
+		})
 
-		for _, kv := range sortedGitCmdDailyValues {
-			fmt.Fprintf(textView, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
-		}
-
-		for _, kv := range sortedSystemCmdDailyValues {
-			fmt.Fprintf(textView, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
-		}
-
-		fmt.Fprintf(textView, "\n\n     [yellow]Overall\n\n")
-
-		for _, kv := range sortedGitCmdTotalValues {
-			fmt.Fprintf(textView, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
-		}
-		for _, kv := range sortedSystemCmdTotalValues {
-			fmt.Fprintf(textView, "\n     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
-		}
-
+		app.QueueUpdateDraw(func() {
+			fmt.Fprintf(bottom, "\nTo Be Continued\n\n")
+		})
 	}()
 
-	textView.SetDoneFunc(func(key tcell.Key) { app.Stop() })
-	textView.SetDynamicColors(true).SetWrap(true)
-	textView.SetBackgroundColor(tcell.NewHexColor(0x0000AA))
-	textView.SetTitle("Shell Analyzer").SetTitleColor(tcell.ColorBlack)
-	textView.SetBorder(true).SetBackgroundColor(tcell.ColorWhite)
+	top.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA))
+	rightBottom.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA)).SetBorder(true)
+	rightTop.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA)).SetBorder(true)
+	left.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA)).SetBorder(true)
+	bottom.SetTextAlign(tview.AlignCenter).SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA))
 
-	if err := app.SetRoot(textView, true).SetFocus(textView).EnableMouse(true).Run(); err != nil {
-		panic(err)
-	}
-	return textView
+	rightFlex := tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(rightTop, 0, 1, false).
+		AddItem(rightBottom, 0, 1, false)
+
+	centerFlex := tview.NewFlex().
+		AddItem(left, 0, 1, false).
+		AddItem(rightFlex, 0, 1, false)
+
+	mainFlex := tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(top, 3, 0, false).
+		AddItem(centerFlex, 0, 1, true).
+		AddItem(bottom, 3, 0, false)
+
+	mainFlex.SetBorder(true).SetBackgroundColor(tcell.ColorWhite)
+
+	return mainFlex
 }

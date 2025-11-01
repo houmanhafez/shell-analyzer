@@ -12,6 +12,8 @@ import (
 	"shell-analyzer/m/data"
 	"shell-analyzer/m/tui"
 	"strings"
+
+	"github.com/rivo/tview"
 )
 
 func main() {
@@ -74,5 +76,10 @@ func main() {
 		}
 	}
 
-	tui.CreateTextView()
+	app := tview.NewApplication()
+	layout := tui.CreateTextView(app)
+	if err := app.SetRoot(layout, true).Run(); err != nil {
+		panic(err)
+	}
+
 }
