@@ -100,17 +100,22 @@ func CreateTextView(app *tview.Application) *tview.Flex {
 				fmt.Fprintf(rightTop, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
 
+			fmt.Fprintf(rightTop, "\n")
+
 			for _, kv := range sortedSystemCmdDailyValues {
 				fmt.Fprintf(rightTop, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
 		})
 
 		app.QueueUpdateDraw(func() {
-			fmt.Fprintf(rightBottom, "\n     [yellow::b]OVERALL USAGE\n\n")
+			fmt.Fprintf(rightBottom, "\n     [green::b]OVERALL USAGE\n\n")
 
 			for _, kv := range sortedGitCmdTotalValues {
 				fmt.Fprintf(rightBottom, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
+
+			fmt.Fprintf(rightBottom, "\n")
+
 			for _, kv := range sortedSystemCmdTotalValues {
 				fmt.Fprintf(rightBottom, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
