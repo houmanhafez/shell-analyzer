@@ -44,10 +44,10 @@ func CreateTextView(app *tview.Application) *tview.Flex {
 			sortedGitCmdTotalValues = append(sortedGitCmdTotalValues, data.GitCmds{Command: commitType, Uses: commits})
 		}
 
-		for command, uses := range UnsortedSystemCmdsDaily {
+		for command, uses := range UnsortedSystemCmdsTotal {
 			sortedSystemCmdTotalValues = append(sortedSystemCmdTotalValues, data.SystemCmds{Command: command, Uses: uses})
 		}
-		for command, uses := range UnsortedSystemCmdsTotal {
+		for command, uses := range UnsortedSystemCmdsDaily {
 			sortedSystemCmdDailyValues = append(sortedSystemCmdDailyValues, data.SystemCmds{Command: command, Uses: uses})
 		}
 
@@ -112,7 +112,7 @@ func CreateTextView(app *tview.Application) *tview.Flex {
 				fmt.Fprintf(rightBottom, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
 			for _, kv := range sortedSystemCmdTotalValues {
-				fmt.Fprintf(rightBottom, "\n     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
+				fmt.Fprintf(rightBottom, "     [white]%-34s - %5d times\n", kv.Command, kv.Uses)
 			}
 		})
 

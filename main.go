@@ -43,6 +43,33 @@ func main() {
 					continue
 				}
 
+				if strings.HasPrefix(singleLine, "-") && strings.Contains(singleLine, "cmd") {
+					parts := strings.SplitN(singleLine, ":", 2)
+					if len(parts) < 2 {
+						continue
+					}
+					singleLine = parts[1]
+				}
+
+				if strings.HasPrefix(singleLine, "-") && strings.Contains(singleLine, "when") {
+					parts := strings.SplitN(singleLine, ":", 2)
+					if len(parts) < 2 {
+						continue
+					}
+					timestamp := strings.TrimSpace(parts[1])
+					unixInt, err := strconv.ParseInt(timestamp, 10, 64)
+					if err != nil {
+						log.Println("Invalid timestamp:", err)
+						continue
+					}
+					data.CmdTime = time.Unix(unixInt, 0)
+					singleLine = parts[1]
+
+					if commands.IsToday(data.CmdTime) {
+						tui.UnsortedSystemCmdsDaily["Commands today"]++
+					}
+				}
+
 				if strings.HasPrefix(singleLine, ":") && strings.Contains(singleLine, ";") {
 					parts := strings.SplitN(singleLine, ";", 2)
 					if len(parts) < 2 {
@@ -60,7 +87,7 @@ func main() {
 					singleLine = parts[1]
 
 					if commands.IsToday(data.CmdTime) {
-						tui.UnsortedGitCmdsDaily["Commands today"]++
+						tui.UnsortedSystemCmdsDaily["Commands today"]++
 					}
 				}
 
