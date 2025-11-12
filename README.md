@@ -2,7 +2,7 @@
 
 Shell Analyzer reads your shell histories and shows you facts about your usage. 
 
-It currently shows your top 10 most used commands (excluding sudo ofc), facts about your git usage and so on.
+It currently shows your top most used commands (excluding sudo ofc), facts about your git usage and so on.
 It uses tview with a vintage BIOS look and runs in the terminal.
 
 ## Requirements
