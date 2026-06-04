@@ -127,9 +127,13 @@ func CreateTextView(app *tview.Application) *tview.Flex {
 	}()
 
 	top.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA))
+	
 	rightBottom.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA)).SetBorder(true)
+	
 	rightTop.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA)).SetBorder(true)
+	
 	left.SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA)).SetBorder(true)
+	
 	bottom.SetTextAlign(tview.AlignCenter).SetDynamicColors(true).SetWrap(true).SetBackgroundColor(tcell.NewHexColor(0x0000AA))
 
 	rightFlex := tview.NewFlex().SetDirection(tview.FlexRow).
